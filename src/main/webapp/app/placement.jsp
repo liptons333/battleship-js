@@ -6,6 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <title>Ship Placement</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        td {
+            width: 20px;
+            text-align: center;
+        }
+        td.SHIP {
+            background-color: greenyellow;
+        }
+        td.MISS {
+            background-color: aqua;
+        }
+        td.HIT {
+            background-color: red;
+        }
+    </style>
 </head>
 <body onload="checkStatus()">
 <div id="wait-another" class="w3-hide">
@@ -43,7 +64,7 @@
             "method": "POST",
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
         }).then(function (response) {

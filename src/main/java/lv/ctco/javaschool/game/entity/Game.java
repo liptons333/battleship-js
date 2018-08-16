@@ -41,4 +41,13 @@ public class Game {
         else
            throw new IllegalStateException();
     }
+
+    public User getOpponentPlayer(User player) {
+        if (player.equals(player1))
+            return player2;
+        else if (player.equals(player2))
+            return player1;
+        else
+            throw new IllegalStateException();
+    }
 }
