@@ -5,6 +5,7 @@ import lombok.extern.java.Log;
 import lv.ctco.javaschool.auth.control.UserStore;
 import lv.ctco.javaschool.auth.entity.domain.User;
 import lv.ctco.javaschool.game.control.GameStore;
+import lv.ctco.javaschool.game.control.HighScoreStore;
 import lv.ctco.javaschool.game.entity.*;
 
 import javax.annotation.security.RolesAllowed;
@@ -35,6 +36,8 @@ public class GameApi {
     private UserStore userStore;
     @Inject
     private GameStore gameStore;
+    @Inject
+    private HighScoreStore highScoreStore;
 
     @POST
     @RolesAllowed({"ADMIN", "USER"})
@@ -139,6 +142,10 @@ public class GameApi {
                     gameStore.setCellState(g, currentUser, address, true, CellState.HIT);
                     if (gameStore.isWin(g, opponent)) {
                         g.setStatus(GameStatus.FINISHED);
+                        HighScore winnerScore = new HighScore();
+                        winnerScore.setPlayer(currentUser);
+                        winnerScore.setMoves(highScoreStore.countWinMoves(g,currentUser));
+                        em.persist(winnerScore);
                     }
                     return;
                 } else if (cell.getState() == CellState.EMPTY) {

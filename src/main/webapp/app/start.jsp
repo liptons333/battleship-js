@@ -22,6 +22,14 @@
                 location.href = "/app/placement.jsp";
             });
     }
+
+    function getHighScore() {
+        fetch("<c:url value='/api/game/highScoreStore'/>",
+            {"method": "POST"})
+            .then(function (response) {
+
+            });
+    }
 </script>
 </body>
 </html>

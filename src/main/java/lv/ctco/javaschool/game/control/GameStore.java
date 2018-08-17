@@ -137,4 +137,15 @@ public class GameStore {
                 .findFirst();
         return !cells.isPresent();
     }
+
+    public int countWinMoves(Game game, User player) {
+        return em.createQuery("Select c from Cell c " +
+                "where c.game=:game and c.user=:user and c.targetArea=true and (c.state=:hit or c.state=:miss)", Cell.class)
+                .setParameter("game",game)
+                .setParameter("user", player)
+                .setParameter("hit", CellState.HIT)
+                .setParameter("miss", CellState.MISS)
+                .getResultList()
+                .size();
+    }
 }
