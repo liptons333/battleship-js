@@ -62,9 +62,9 @@ public class GameApi {
     @Path("/cells")
     public List<CellStateDto> getCells() {
         User currentUser = userStore.getCurrentUser();
-        Optional<Game> game = gameStore.getStartedGameFor(currentUser,GameStatus.STARTED);
+        Optional<Game> game = gameStore.getStartedGameFor(currentUser, GameStatus.STARTED);
         return game.map(g -> {
-            List<Cell> cells = gameStore.getCells(g,currentUser);
+            List<Cell> cells = gameStore.getCells(g, currentUser);
             return cells.stream()
                     .map(this::convertToCellStateDto)
                     .collect(Collectors.toList());
@@ -96,7 +96,7 @@ public class GameApi {
                     if ("SHIP".equals(value))
                         ships.add(addr);
                 }
-                gameStore.setShips(g,currentUser,false,ships);
+                gameStore.setShips(g, currentUser, false, ships);
                 g.setPlayerActive(currentUser, false);
                 if (!g.isPlayer1Active() && !g.isPlayer2Active()) {
                     g.setStatus(GameStatus.STARTED);
@@ -113,7 +113,7 @@ public class GameApi {
     @Path("/status")
     public GameDto getGameStatus() {
         User currentUser = userStore.getCurrentUser();
-        Optional<Game> game = gameStore.getOpenGameFor(currentUser);
+        Optional<Game> game = gameStore.getLastGameFor(currentUser);
         return game.map(g -> {
             GameDto dto = new GameDto();
             dto.setStatus(g.getStatus());
@@ -130,28 +130,25 @@ public class GameApi {
         Optional<Game> game = gameStore.getOpenGameFor(currentUser);
         game.ifPresent(g -> {
             User opponent = g.getOpponentPlayer(currentUser);
-            Optional<Cell> enemyCell = gameStore.findCell(g,opponent,address,false);
+            Optional<Cell> enemyCell = gameStore.findCell(g, opponent, address, false);
 
-            if (enemyCell.isPresent()){
+            if (enemyCell.isPresent()) {
                 Cell cell = enemyCell.get();
-                if (cell.getState() == CellState.SHIP){
+                if (cell.getState() == CellState.SHIP) {
                     cell.setState(CellState.HIT);
-                    gameStore.setCellState(g, currentUser, address,true, CellState.HIT);
-                }else if (cell.getState() == CellState.EMPTY) {
+                    gameStore.setCellState(g, currentUser, address, true, CellState.HIT);
+                    if (gameStore.isWin(g, opponent)) {
+                        g.setStatus(GameStatus.FINISHED);
+                    }
+                    return;
+                } else if (cell.getState() == CellState.EMPTY) {
                     cell.setState(CellState.MISS);
-                    gameStore.setCellState(g, currentUser, address,true, CellState.MISS);
+                    gameStore.setCellState(g, currentUser, address, true, CellState.MISS);
                 }
-
             } else {
-                gameStore.setCellState(g, currentUser, address,true, CellState.MISS);
+                gameStore.setCellState(g, currentUser, address, true, CellState.MISS);
                 gameStore.setCellState(g, opponent, address, false, CellState.MISS);
             }
-
-            if (gameStore.isWin(g,opponent)) {
-                System.out.println("True");
-            }else
-                System.out.println("False");
-
             boolean p1a = g.isPlayer1Active();
             g.setPlayer1Active(!p1a);
             g.setPlayer2Active(p1a);

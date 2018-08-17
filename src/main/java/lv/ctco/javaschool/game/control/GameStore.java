@@ -54,6 +54,14 @@ public class GameStore {
                 .findFirst();
     }
 
+    public Optional<Game> getLastGameFor(User user) {
+        return em.createQuery("Select g from Game g " +
+                "where g.player1=:user or g.player2=:user order by g.id desc ",Game.class)
+                .setParameter("user", user)
+                .getResultStream()
+                .findFirst();
+    }
+
     public Optional<Cell> findCell(Game game, User player, String address, boolean targetArea) {
         return em.createQuery(
                 "select c from Cell c " +
@@ -118,17 +126,14 @@ public class GameStore {
                 .getResultList();
     }
 
-    public boolean isWin(Game game, User player) {
+    public boolean isWin(Game game, User opponent) {
         Optional<Cell> cells = em.createQuery("Select c from Cell c " +
                 "where c.game=:game and c.user=:user and c.state=:state", Cell.class)
                 .setParameter("game",game)
-                .setParameter("user",player)
+                .setParameter("user",opponent)
                 .setParameter("state", CellState.SHIP)
                 .getResultStream()
                 .findFirst();
-        if (cells.isPresent())
-            return true;
-        else
-            return false;
+        return !cells.isPresent();
     }
 }

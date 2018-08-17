@@ -9,19 +9,24 @@
         table {
             border-collapse: collapse;
         }
+
         table, th, td {
             border: 1px solid black;
         }
+
         td {
             width: 20px;
             text-align: center;
         }
+
         td.SHIP {
             background-color: greenyellow;
         }
+
         td.MISS {
             background-color: aqua;
         }
+
         td.HIT {
             background-color: red;
         }
@@ -88,6 +93,7 @@
             return response.json();
         }).then(function (game) {
             console.log(JSON.stringify(game));
+
             if (game.status === "STARTED" && game.playerActive) {
                 document.getElementById("wait-another").classList.add("w3-hide");
                 document.getElementById("select-fire").classList.remove("w3-hide");
@@ -99,7 +105,10 @@
                 window.setTimeout(function () {
                     checkStatus();
                 }, 1000);
-            } else
+            } else if (game.status === "FINISHED") {
+                location.href = "<c:url value='/app/result.jsp'/>";
+            }
+            else
                 return;
             drawField();
         });
@@ -132,7 +141,7 @@
     }
 
     function drawField() {
-        console.log("Draw Field!");
+        console.log("Drawing Field!");
         fetch("<c:url value='/api/game/cells'/>", {
             "method": "GET",
             headers: {
@@ -147,6 +156,7 @@
                 var id = (currentCell.targetArea ? "t" : "m") + currentCell.address;
                 var tblCell = document.getElementById(id);
                 tblCell.className = currentCell.state;
+                console.log("DONE!");
             });
         });
     }
